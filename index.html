@@ -4,46 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AdButler Implementation Toolkit</title>
+    <!-- Load Poppins from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Load Tailwind CSS for modern, responsive styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Poppins', sans-serif; }
-        /* Style for the 'Advertisement' label */
+        /* BRAND GUIDELINES */
+        :root {
+            --brand-yellow: #F9DC6B;
+            --brand-navy: #252535;
+            --brand-light-gray: #EEF3F7;
+            --brand-teal: #028072;
+        }
+
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--brand-light-gray); /* #EEF3F7 */
+        }
+        
+        /* Ensures high contrast for all main text */
+        .text-brand-navy { color: var(--brand-navy); }
+        .bg-brand-navy { background-color: var(--brand-navy); }
+
+        /* Style for the 'Advertisement' label (low contrast, used for subtle disclosure) */
         .ad-label {
             font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: #4b5563;
+            color: #6b7280; /* Gray-500, ensures readability but remains subtle */
             margin-bottom: 0.25rem;
             font-weight: 600;
         }
-        /* Styling for the responsive wrapper */
+
+        /* Styling for the responsive wrapper (uses light brand colors) */
         .responsive-ad-wrapper {
             max-width: 100%;
             height: auto;
             margin: 1rem 0;
             padding: 1rem;
-            border: 1px solid #4b5563;
+            border: 1px solid #d1d5db; 
             border-radius: 0.5rem;
-            background-color: #EEF3F7;
+            background-color: #f9fafb; /* Off-white for readability */
+        }
+
+        /* Primary Button Style (Teal background with white text for high contrast) */
+        .btn-primary {
+            background-color: var(--brand-teal); 
+            color: white;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: #016a5c; /* Slightly darker teal on hover */
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-4 sm:p-8">
+<body class="min-h-screen p-4 sm:p-8">
 
-    <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-6 md:p-10">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">IAM Zone Tag Builder</h1>
+    <div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl p-6 md:p-10">
+        <h1 class="text-3xl font-bold text-brand-navy mb-2">Implementation Tag Builder</h1>
         <p class="text-gray-600 mb-6">Enter the Publisher ID to fetch, modify, and collect all website and email zone tags.</p>
 
         <!-- Input and Action Controls -->
-        <div class="flex flex-col md:flex-row gap-4 mb-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+        <div class="flex flex-col md:flex-row gap-4 mb-8 p-4 rounded-lg border border-brand-light-gray" style="background-color: var(--brand-light-gray);">
             <input type="text" id="publisherId" placeholder="Enter AdButler Publisher ID (e.g., 123456)"
-                   class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm text-gray-700">
+                   class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-brand-teal focus:border-brand-teal shadow-sm text-brand-navy">
             <button id="fetchButton"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-200 disabled:opacity-50">
+                    class="btn-primary font-semibold py-3 px-6 rounded-lg shadow-md">
                 Fetch & Process Tags
             </button>
         </div>
@@ -56,9 +85,9 @@
 
             <!-- Website Tags Section -->
             <div>
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+                <h2 class="text-2xl font-semibold text-brand-navy mb-4 flex items-center">
                     Website Ad Zones (Header Script Assumed)
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2" style="color: var(--brand-teal);" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                     </svg>
                 </h2>
@@ -72,7 +101,7 @@
                 <div id="websiteTagsOutput" class="space-y-6">
                     <!-- Website tags will be injected here -->
                 </div>
-                <button onclick="copyAllTags('websiteTagsOutput')" class="mt-4 text-sm font-medium text-blue-600 hover:text-blue-800 transition duration-150">
+                <button onclick="copyAllTags('websiteTagsOutput')" class="mt-4 text-sm font-medium hover:text-brand-teal transition duration-150" style="color: var(--brand-teal);">
                     Copy All Website Tags
                 </button>
             </div>
@@ -81,9 +110,9 @@
 
             <!-- Email Tags Section -->
             <div>
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+                <h2 class="text-2xl font-semibold text-brand-navy mb-4 flex items-center">
                     Email Newsletter Zones (EUID Placeholder Added)
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2" style="color: var(--brand-yellow);" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
                         <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
                     </svg>
@@ -94,7 +123,7 @@
                 <div id="emailTagsOutput" class="space-y-6">
                     <!-- Email tags will be injected here -->
                 </div>
-                <button onclick="copyAllTags('emailTagsOutput')" class="mt-4 text-sm font-medium text-blue-600 hover:text-blue-800 transition duration-150">
+                <button onclick="copyAllTags('emailTagsOutput')" class="mt-4 text-sm font-medium hover:text-brand-teal transition duration-150" style="color: var(--brand-teal);">
                     Copy All Email Tags
                 </button>
             </div>
@@ -139,20 +168,6 @@
          * REPLACE THIS FUNCTION with your actual authenticated API call logic.
          */
         async function fetchAdButlerZones(publisherId) {
-            // --- ACTUAL API CALL LOGIC ---
-            // const url = `${API_ENDPOINT}?publisherId=${publisherId}`;
-            // const options = {
-            //     method: 'GET',
-            //     headers: {
-            //         'Authorization': `Bearer ${API_KEY}`, // Or whatever authentication method AdButler uses
-            //         'Content-Type': 'application/json'
-            //     }
-            // };
-            // const response = await fetchWithRetry(url, options);
-            // const data = await response.json();
-            // return data.zones;
-            // -----------------------------
-
             // --- MOCK DATA FOR DEMONSTRATION ---
             statusMessage.textContent = 'Simulating API call and processing zones...';
             await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network latency
@@ -165,25 +180,23 @@
                 { id: 402, name: "Newsletter Bottom Rectangle", type: "email", width: 300, height: 250 },
             ];
 
-            // FIX: Using string concatenation with explicit '\n' instead of multiline template literals
-            // for the raw tags to prevent SyntaxErrors in some environments.
             return mockZones.map(zone => {
                 const rawTag = zone.type === 'website' 
-                    ? '<!-- AdButler Zone ' + zone.id + ': ' + zone.name + ' -->\n' +
-                      '<div id="adbutler-zone-' + zone.id + '"></div>\n' +
-                      '<script type="text/javascript" src="https://servedbyadbutler.com/app.js"></script>\n' +
-                      '<script type="text/javascript">\n' +
-                      '    adbutler.optimize.fetch({\n' +
-                      '        zone: ' + zone.id + ',\n' +
-                      '        width: ' + zone.width + ',\n' +
-                      '        height: ' + zone.height + ',\n' +
-                      "        type: 'async'\n" +
-                      '    });\n' +
-                      '</script>'
-                    : '<!-- AdButler Email Zone ' + zone.id + ': ' + zone.name + ' -->\n' +
-                      '<a href="https://servedbyadbutler.com/cl.srv?sid=12345&pub=99999&zone=' + zone.id + '&pid=0&ord=[EUID_PLACEHOLDER]" target="_blank" rel="noopener">\n' +
-                      '    <img src="https://servedbyadbutler.com/ad.srv?sid=12345&pub=99999&zone=' + zone.id + '&pid=0&ord=[EUID_PLACEHOLDER]" alt="' + zone.name + '" border="0" width="' + zone.width + '" height="' + zone.height + '">\n' +
-                      '</a>';
+                    ? `<!-- AdButler Zone ${zone.id}: ${zone.name} -->
+<div id="adbutler-zone-${zone.id}"></div>
+<script type="text/javascript" src="https://servedbyadbutler.com/app.js"></script>
+<script type="text/javascript">
+    adbutler.optimize.fetch({
+        zone: ${zone.id},
+        width: ${zone.width},
+        height: ${zone.height},
+        type: 'async'
+    });
+</script>`
+                    : `<!-- AdButler Email Zone ${zone.id}: ${zone.name} -->
+<a href="https://servedbyadbutler.com/cl.srv?sid=12345&pub=99999&zone=${zone.id}&pid=0&ord=[EUID_PLACEHOLDER]" target="_blank" rel="noopener">
+    <img src="https://servedbyadbutler.com/ad.srv?sid=12345&pub=99999&zone=${zone.id}&pid=0&ord=[EUID_PLACEHOLDER]" alt="${zone.name}" border="0" width="${zone.width}" height="${zone.height}">
+</a>`;
                 
                 return {
                     ...zone,
@@ -199,17 +212,164 @@
             let processedTag = zone.rawTag;
 
             // 1. Remove the JS library call
-            // We are looking for the common library load script.
             const jsLibRegex = /<script\s+[^>]*src=["']https:\/\/servedbyadbutler\.com\/app\.js["'][^>]*><\/script>/gi;
             processedTag = processedTag.replace(jsLibRegex, '');
 
             // 2. Add wrapper for responsiveness and 'Advertisement' label
-            // FIX: Converting template literal to string concatenation
-            const indent = '        ';
-            const indentedProcessedTag = processedTag.trim().split('\n').map(line => indent + line).join('\n');
+            const indentedProcessedTag = processedTag.trim().split('\n').map(line => '        ' + line).join('\n');
 
             const wrappedTag = 
-                '<div class="responsive-ad-wrapper">\n' +
-                '    <!-- Zone: ' + zone.name + ' (' + zone.width + 'x' + zone.height + ') -->\n' +
+                `<div class="responsive-ad-wrapper">
+    <!-- Zone: ${zone.name} (${zone.width}x${zone.height}) -->
+    <div class="ad-label">Advertisement</div>
+    <div class="adbutler-container-${zone.id}">
+${indentedProcessedTag}
+    </div>
+</div>`.trim();
 
-                '    <div class="ad-label">Advertisement</div>\n' +
+            return wrappedTag;
+        }
+
+        /**
+         * Modifies the email tag to include the EUID placeholder.
+         */
+        function processEmailTag(zone) {
+            let processedTag = zone.rawTag;
+            
+            processedTag = processedTag.replace(/ord=([^&\s"]+)/g, 'ord=[EUID_PLACEHOLDER]');
+
+            return processedTag;
+        }
+
+        /**
+         * Renders the processed tags to the UI.
+         */
+        function renderTags(zones) {
+            websiteTagsOutput.innerHTML = '';
+            emailTagsOutput.innerHTML = '';
+            
+            const websiteZones = zones.filter(z => z.type === 'website');
+            const emailZones = zones.filter(z => z.type === 'email');
+
+            // Render Website Tags
+            websiteZones.forEach(zone => {
+                const processedTag = processWebsiteTag(zone);
+                
+                websiteTagsOutput.innerHTML += `
+                    <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                        <h4 class="font-bold text-brand-navy mb-2">${zone.name} (Zone ID: ${zone.id})</h4>
+                        <textarea readonly class="w-full h-64 p-3 text-sm font-mono bg-gray-50 border border-gray-300 rounded-lg whitespace-pre-wrap">${processedTag}</textarea>
+                    </div>
+                `;
+            });
+
+            // Render Email Tags
+            emailZones.forEach(zone => {
+                const processedTag = processEmailTag(zone);
+                emailTagsOutput.innerHTML += `
+                    <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                        <h4 class="font-bold text-brand-navy mb-2">${zone.name} (Zone ID: ${zone.id})</h4>
+                        <textarea readonly class="w-full h-40 p-3 text-sm font-mono bg-gray-50 border border-gray-300 rounded-lg whitespace-pre-wrap">${processedTag}</textarea>
+                    </div>
+                `;
+            });
+
+            if (websiteZones.length === 0 && emailZones.length === 0) {
+                statusMessage.textContent = 'No zones found for this Publisher ID.';
+                resultsContainer.classList.add('hidden');
+            } else {
+                statusMessage.textContent = `Successfully processed ${zones.length} zones.`; 
+                statusMessage.classList.remove('text-red-600', 'text-blue-500');
+                statusMessage.classList.add('text-brand-navy'); // Use brand navy for success/status text
+                resultsContainer.classList.remove('hidden');
+            }
+        }
+        
+        /**
+         * Copies all tags from a container (textarea content only).
+         */
+        function copyAllTags(containerId) {
+            const container = document.getElementById(containerId);
+            const textareas = container.querySelectorAll('textarea');
+            let allText = '';
+            textareas.forEach(textarea => {
+                allText += textarea.value + '\n\n' + '<!-- --- SEPARATOR --- -->' + '\n\n';
+            });
+
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = allText.trim();
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            
+            try {
+                document.execCommand('copy');
+                alertBox.show('Success!', 'All tags copied to clipboard.', 'bg-brand-teal');
+            } catch (err) {
+                alertBox.show('Error', 'Could not copy text. Please select and copy manually.', 'bg-red-500');
+                console.error('Copy failed:', err);
+            } finally {
+                document.body.removeChild(tempTextArea);
+            }
+        }
+
+        // Custom non-blocking Alert Box implementation
+        const alertBox = {
+            element: null,
+            init() {
+                if (this.element) return; 
+                this.element = document.createElement('div');
+                this.element.id = 'custom-alert';
+                this.element.className = `fixed top-4 right-4 p-4 rounded-lg text-white shadow-lg transition-transform duration-300 transform translate-x-full z-50`;
+                document.body.appendChild(this.element);
+            },
+            show(title, message, bgColor) {
+                this.init();
+                this.element.className = `fixed top-4 right-4 p-4 rounded-lg text-white shadow-lg transition-transform duration-300 transform translate-x-full z-50 ${bgColor}`;
+                // FIX: Replacing template literal with string concatenation for maximum compatibility
+                this.element.innerHTML = '<p class="font-bold">' + title + '</p><p class="text-sm">' + message + '</p>';
+                
+                // Show animation
+                setTimeout(() => this.element.classList.remove('translate-x-full'), 10);
+                
+                // Hide animation
+                setTimeout(() => this.element.classList.add('translate-x-full'), 3000);
+            }
+        };
+
+
+        /**
+         * Main event listener for the fetch button.
+         */
+        fetchButton.addEventListener('click', async () => {
+            const publisherId = publisherIdInput.value.trim();
+            if (!publisherId) {
+                statusMessage.textContent = 'Please enter a Publisher ID.';
+                return;
+            }
+
+            fetchButton.disabled = true;
+            statusMessage.textContent = 'Fetching and processing tags...';
+            statusMessage.classList.remove('text-red-600', 'text-green-600', 'text-brand-navy');
+            statusMessage.classList.add('text-blue-500'); // Temp blue for loading
+            resultsContainer.classList.add('hidden');
+            
+            try {
+                const zones = await fetchAdButlerZones(publisherId);
+                renderTags(zones);
+            } catch (error) {
+                console.error('Processing error:', error);
+                statusMessage.textContent = `Error fetching data: ${error.message}. Check console for details.`;
+                statusMessage.classList.remove('text-blue-500', 'text-green-600', 'text-brand-navy');
+                statusMessage.classList.add('text-red-600');
+                resultsContainer.classList.add('hidden');
+            } finally {
+                fetchButton.disabled = false;
+            }
+        });
+        
+        // Expose copy function globally for inline click event
+        window.copyAllTags = copyAllTags;
+
+    </script>
+</body>
+</html>
