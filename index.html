@@ -84,7 +84,7 @@
             </div>
             <div class="mt-4 md:mt-0 text-right">
                 <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-semibold uppercase tracking-wide">
-                    v3.0 (Secure Proxy)
+                    v3.1 (Error Handling)
                 </span>
             </div>
         </div>
@@ -290,6 +290,7 @@ if (!window.AdButler){
                         const errText = await response.text();
                         // Handle user-friendly errors
                         if (response.status === 400) throw new Error('Invalid Publisher ID');
+                        if (response.status === 403) throw new Error('Access Denied: Check API Key in Cloudflare Variables');
                         if (response.status === 500) throw new Error('AdButler API Error (Check Worker Logs)');
                         throw new Error(`API Error: ${response.status} - ${response.statusText}`);
                     }
