@@ -87,7 +87,7 @@
             </div>
             <div class="mt-4 md:mt-0 text-right">
                 <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-semibold uppercase tracking-wide">
-                    v3.3 (Debug Mode)
+                    v3.4 (Smart Errors)
                 </span>
             </div>
         </div>
@@ -236,7 +236,7 @@
         
         // IMPORTANT: Replace this with your actual Cloudflare Worker URL
         // Example: 'https://adbutler-proxy.yourname.workers.dev'
-        const WORKER_URL = 'https://adbutler-proxy.allison-9f0.workers.dev'; 
+        const WORKER_URL = 'https://adbutler-proxy.allison-9f0.workers.dev/'; 
 
         // --- DOM ELEMENTS ---
         const publisherIdInput = document.getElementById('publisherId');
@@ -298,7 +298,14 @@ if (!window.AdButler){
                         
                         // Expanded Error Handling for Auth Issues
                         if (response.status === 401 || response.status === 403) {
-                             throw new Error(`Access Denied (${response.status}): Check Cloudflare API Key. Details: ${errText}`);
+                             // Try to parse clean message from JSON
+                             let errorDetail = errText;
+                             try {
+                                const errObj = JSON.parse(errText);
+                                if (errObj.message) errorDetail = errObj.message;
+                             } catch(e) {}
+
+                             throw new Error(`Access Denied: ${errorDetail} (Check Cloudflare Variables)`);
                         }
                         
                         if (response.status === 500) throw new Error('AdButler/Worker Error (500). Check Worker Logs.');
