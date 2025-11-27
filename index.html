@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AdButler Implementation Toolkit</title>
+    <!-- Add Favicon to prevent 404 errors -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏷️</text></svg>">
+    
     <!-- Load Poppins from Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Load Tailwind CSS -->
@@ -84,7 +87,7 @@
             </div>
             <div class="mt-4 md:mt-0 text-right">
                 <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-semibold uppercase tracking-wide">
-                    v3.1 (Error Handling)
+                    v3.3 (Debug Mode)
                 </span>
             </div>
         </div>
@@ -288,11 +291,20 @@ if (!window.AdButler){
                     
                     if (!response.ok) {
                         const errText = await response.text();
+                        console.error("Worker Response:", errText); // DEBUGGING LOG
+
                         // Handle user-friendly errors
-                        if (response.status === 400) throw new Error('Invalid Publisher ID');
-                        if (response.status === 403) throw new Error('Access Denied: Check API Key in Cloudflare Variables');
-                        if (response.status === 500) throw new Error('AdButler API Error (Check Worker Logs)');
-                        throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+                        if (response.status === 400) throw new Error('Invalid Publisher ID (400)');
+                        
+                        // Expanded Error Handling for Auth Issues
+                        if (response.status === 401 || response.status === 403) {
+                             throw new Error(`Access Denied (${response.status}): Check Cloudflare API Key. Details: ${errText}`);
+                        }
+                        
+                        if (response.status === 500) throw new Error('AdButler/Worker Error (500). Check Worker Logs.');
+                        
+                        // Fallback includes specific error text
+                        throw new Error(`API Error: ${response.status} - ${errText || response.statusText}`);
                     }
                     
                     const data = await response.json();
