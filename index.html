@@ -38,7 +38,7 @@
             </div>
             <div class="mt-4 md:mt-0 text-right">
                 <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-semibold uppercase tracking-wide">
-                    v5.0 (Manual ID)
+                    v5.1 (Connection Test)
                 </span>
             </div>
         </div>
@@ -57,6 +57,11 @@
                             class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-teal focus:border-brand-teal outline-none transition text-brand-navy font-mono">
                         <i class="fa-solid fa-id-badge absolute left-3 top-3.5 text-gray-400"></i>
                     </div>
+                    <!-- TEST CONNECTION LINK -->
+                    <button id="testConnectionBtn" class="mt-2 text-xs text-brand-teal hover:underline flex items-center">
+                        <i class="fa-solid fa-stethoscope mr-1"></i> Verify API Key Permissions
+                    </button>
+                    <p id="testStatus" class="text-xs mt-1 font-medium hidden"></p>
                 </div>
             </div>
 
@@ -148,6 +153,8 @@
         const euidCustomInput = document.getElementById('euidCustomInput');
         const statusMessage = document.getElementById('statusMessage');
         const statusIndicator = document.getElementById('statusIndicator');
+        const testConnectionBtn = document.getElementById('testConnectionBtn');
+        const testStatus = document.getElementById('testStatus');
         
         let currentZones = [];
 
@@ -163,6 +170,31 @@
 
         euidCustomInput.addEventListener('input', () => { if (currentZones.length > 0) renderTags(); });
         tagTypeSelect.addEventListener('change', () => { if (currentZones.length > 0) renderTags(); });
+
+        // --- TEST CONNECTION ---
+        testConnectionBtn.addEventListener('click', async () => {
+            testStatus.classList.remove('hidden');
+            testStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking permissions...';
+            testStatus.className = "text-xs mt-1 font-medium text-blue-600";
+            
+            try {
+                // Fetch without params = Get Parent Zones
+                const response = await fetch(`${WORKER_URL}`);
+                const data = await response.json();
+                
+                if(!response.ok) throw new Error(data.error || response.statusText);
+                
+                testStatus.innerHTML = '<i class="fa-solid fa-check-circle"></i> Key is VALID for Zones!';
+                testStatus.className = "text-xs mt-1 font-medium text-green-600";
+                
+                // If this works, but publisher fetch fails, it's the ID.
+                setTimeout(() => { alert("Great! Your API Key works. \n\nIf you get an error when fetching a specific publisher, it means that specific ID is incorrect or not linked to your parent account."); }, 100);
+
+            } catch (err) {
+                testStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Test Failed: ${err.message}`;
+                testStatus.className = "text-xs mt-1 font-medium text-red-600";
+            }
+        });
 
         // --- FETCH LOGIC ---
         fetchZonesButton.addEventListener('click', async () => {
@@ -193,7 +225,13 @@
             } catch (error) {
                 console.error(error);
                 setStatus('Error', 'error');
-                alert(`Error fetching zones: ${error.message}`);
+                
+                let msg = error.message;
+                if(msg.includes('403')) {
+                    msg = "Access Denied (403). \n\n1. Use the 'Verify API Key' link above.\n2. If that works, double check your Publisher ID.\n3. If Verify fails, check 'Zones' permission in AdButler API settings.";
+                }
+                alert(msg);
+
             } finally {
                 fetchZonesButton.innerHTML = '<i class="fa-solid fa-bolt mr-2"></i> Get Zone Tags';
                 fetchZonesButton.disabled = false;
