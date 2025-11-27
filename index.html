@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IAM Implementation Toolkit</title>
+    <title>AdButler Implementation Toolkit</title>
     <!-- Load Poppins from Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Load Tailwind CSS -->
@@ -78,13 +78,13 @@
             <div>
                 <h1 class="text-3xl font-bold text-brand-navy mb-2">
                     <i class="fa-solid fa-tags mr-2 text-brand-yellow"></i>
-                    IAM Tag Builder
+                    AdButler Tag Builder
                 </h1>
                 <p class="text-gray-600">Securely fetch, customize, and clean zone tags for Indiegraf publications.</p>
             </div>
             <div class="mt-4 md:mt-0 text-right">
                 <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-semibold uppercase tracking-wide">
-                    v2.1 Stable
+                    v3.0 (Secure Proxy)
                 </span>
             </div>
         </div>
@@ -97,22 +97,13 @@
                 <h3 class="font-bold text-brand-navy border-b pb-2">1. Connection Settings</h3>
                 
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">AdButler API Key</label>
-                    <div class="relative">
-                        <input type="password" id="apiKey" placeholder="Paste API Key (Optional for Demo)"
-                            class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-teal focus:border-brand-teal outline-none transition text-sm">
-                        <i class="fa-solid fa-key absolute left-3 top-3.5 text-gray-400"></i>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-1">Leave empty to use simulated data.</p>
-                </div>
-
-                <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Publisher ID</label>
                     <div class="relative">
                         <input type="text" id="publisherId" placeholder="e.g. 185279"
                             class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-teal focus:border-brand-teal outline-none transition text-brand-navy font-mono">
                         <i class="fa-solid fa-id-badge absolute left-3 top-3.5 text-gray-400"></i>
                     </div>
+                    <p class="text-xs text-gray-400 mt-2">API Key is securely handled by the backend.</p>
                 </div>
             </div>
 
@@ -132,7 +123,6 @@
                             <option value="async">Async JavaScript (Recommended)</option>
                             <option value="standard">Standard JavaScript</option>
                             <option value="async_1_1">Async 1.1</option>
-                            <!-- <option value="json">JSON API</option> -->
                         </select>
                         <p class="text-xs text-gray-500 mt-2">
                             Automatically removes library calls & adds lazy loading support.
@@ -241,9 +231,12 @@
         // --- CONSTANTS & CONFIG ---
         const DOMAIN = 'servedby.indiegraf.com';
         
+        // IMPORTANT: Replace this with your actual Cloudflare Worker URL
+        // Example: 'https://adbutler-proxy.yourname.workers.dev'
+        const WORKER_URL = 'https://adbutler-proxy.allison-9f0.workers.dev'; 
+
         // --- DOM ELEMENTS ---
         const publisherIdInput = document.getElementById('publisherId');
-        const apiKeyInput = document.getElementById('apiKey');
         const tagTypeSelect = document.getElementById('tagTypeSelect');
         const euidInput = document.getElementById('euidInput');
         const fetchButton = document.getElementById('fetchButton');
@@ -255,14 +248,10 @@
         const globalHeaderScript = document.getElementById('globalHeaderScript');
 
         // --- STATE ---
-        let currentZones = []; // Store fetched zones to allow re-rendering without re-fetching
+        let currentZones = []; 
 
         // --- CORE LOGIC ---
 
-        /**
-         * Global Header Script Template
-         * This script lazy loads the AdButler library.
-         */
         const GLOBAL_HEADER_TEMPLATE = `<script type="text/javascript">
 if (!window.AdButler){
     (function(){
@@ -278,13 +267,9 @@ if (!window.AdButler){
 
         globalHeaderScript.value = GLOBAL_HEADER_TEMPLATE;
 
-        /**
-         * Fetches zones from API or Mock Data
-         */
         async function fetchZones() {
             const pubId = publisherIdInput.value.trim();
-            const apiKey = apiKeyInput.value.trim();
-
+            
             if (!pubId) {
                 showToast('Please enter a Publisher ID', true);
                 publisherIdInput.focus();
@@ -296,41 +281,50 @@ if (!window.AdButler){
             try {
                 let zones = [];
 
-                if (apiKey) {
-                    // Real API Call
-                    // Note: This often fails in browsers due to CORS unless a proxy is used.
-                    // We attempt it, but catch errors.
-                    const response = await fetch(`https://api.adbutler.com/v1/zones?publisher_id=${pubId}`, {
-                        headers: { 'Authorization': `Basic ${btoa(apiKey + ':')}` }
-                    });
+                if (WORKER_URL) {
+                    // --- SECURE BACKEND CALL ---
+                    // Calls your Cloudflare Worker which holds the API key
+                    const response = await fetch(`${WORKER_URL}?publisher_id=${pubId}`);
                     
-                    if (!response.ok) throw new Error('API Error: ' + response.statusText);
+                    if (!response.ok) {
+                        const errText = await response.text();
+                        // Handle user-friendly errors
+                        if (response.status === 400) throw new Error('Invalid Publisher ID');
+                        if (response.status === 500) throw new Error('AdButler API Error (Check Worker Logs)');
+                        throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+                    }
+                    
                     const data = await response.json();
-                    zones = data.data || []; // Adjust based on actual API response structure
+                    zones = data.data || []; 
                 } else {
-                    // Mock Data Simulation
-                    await new Promise(r => setTimeout(r, 800)); // Fake delay
+                    // --- MOCK DATA SIMULATION (If no Worker URL set) ---
+                    console.warn("No WORKER_URL set. Using mock data.");
+                    await new Promise(r => setTimeout(r, 800)); 
                     zones = generateMockZones(pubId);
+                    setStatus('Simulated Data (Configure Worker for Real Data)', 'neutral');
                 }
 
                 currentZones = zones;
                 renderAllTags();
                 
-                setStatus('Data fetched successfully', 'success');
+                if (WORKER_URL) {
+                     setStatus('Data fetched successfully', 'success');
+                }
                 resultsContainer.classList.remove('hidden');
 
             } catch (error) {
                 console.error(error);
-                setStatus('Failed: ' + error.message, 'error');
-                showToast('Error fetching data. See console.', true);
+                let msg = error.message;
+                if (msg.includes('Failed to fetch')) {
+                    msg = "Network Error: Could not reach Worker. Check URL.";
+                }
+                setStatus(msg, 'error');
+                showToast('Error fetching data.', true);
             } finally {
                 setLoading(false);
             }
         }
 
-        /**
-         * Re-renders all tags based on current configuration (EUID, Tag Type)
-         */
         function renderAllTags() {
             if (!currentZones.length) return;
 
@@ -341,21 +335,19 @@ if (!window.AdButler){
             const euid = euidInput.value.trim() || '[EUID_PLACEHOLDER]';
             const pubId = publisherIdInput.value.trim();
 
-            const webZones = currentZones.filter(z => z.type === 'banner' || z.type === 'website'); // AdButler sometimes calls them 'banner'
+            const webZones = currentZones.filter(z => z.type === 'banner' || z.type === 'website'); 
             const emailZones = currentZones.filter(z => z.type === 'email');
 
-            // 1. Process Website Zones
+            // Website Zones
             if(webZones.length === 0) websiteTagsContainer.innerHTML = '<p class="text-gray-500 italic">No website zones found.</p>';
-            
             webZones.forEach(zone => {
                 const tagCode = generateWebTag(zone, pubId, webType);
                 const card = createTagCard(zone, tagCode, 'web');
                 websiteTagsContainer.appendChild(card);
             });
 
-            // 2. Process Email Zones
+            // Email Zones
             if(emailZones.length === 0) emailTagsContainer.innerHTML = '<p class="text-gray-500 italic">No email zones found.</p>';
-            
             emailZones.forEach(zone => {
                 const tagCode = generateEmailTag(zone, pubId, euid);
                 const card = createTagCard(zone, tagCode, 'email');
@@ -363,15 +355,9 @@ if (!window.AdButler){
             });
         }
 
-        /**
-         * Generates the CLEANED Website Tag (No Library Call)
-         */
         function generateWebTag(zone, pubId, type) {
-            const divId = `placement_${zone.id}_0`; // Simplified ID logic
+            const divId = `placement_${zone.id}_0`; 
             
-            // Note: We deliberately EXCLUDE the <script src="...app.js"> part here 
-            // because it's now in the Global Header.
-
             if (type === 'async') {
                 return `<!-- AdButler Zone: ${zone.name} -->
 <div id="${divId}" class="adbutler-zone" style="min-height:${zone.height}px; width:100%; max-width:${zone.width}px; margin: 0 auto;"></div>
@@ -389,7 +375,6 @@ AdButler.ads.push({handler: function(opt){ AdButler.register(${pubId}, ${zone.id
 <\/script>`;
             }
 
-            // Fallback for Async 1.1 or others (simplified for demo)
             return `<!-- AdButler Zone: ${zone.name} -->
 <div id="${divId}"></div>
 <script type="text/javascript">
@@ -398,14 +383,8 @@ AdButler.ads.push({handler: function(opt){ AdButler.register(${pubId}, ${zone.id
 <\/script>`;
         }
 
-        /**
-         * Generates the RESPONSIVE Email Tag
-         */
         function generateEmailTag(zone, pubId, euid) {
-            // We use inline styles for responsiveness in email clients
             const style = `display:block; max-width:100%; height:auto; border:0;`;
-            
-            // Note: Email tags are pure HTML (<a> wrapping <img>)
             return `<!-- Email Zone: ${zone.name} -->
 <a href="https://${DOMAIN}/cl.srv?sid=${pubId}&zone=${zone.id}&pid=0&ord=${euid}" target="_blank">
     <img src="https://${DOMAIN}/ad.srv?sid=${pubId}&zone=${zone.id}&pid=0&ord=${euid}" 
@@ -416,16 +395,11 @@ AdButler.ads.push({handler: function(opt){ AdButler.register(${pubId}, ${zone.id
 </a>`;
         }
 
-        /**
-         * Creates a UI Card for a tag result
-         */
         function createTagCard(zone, code, type) {
             const wrapper = document.createElement('div');
             wrapper.className = 'bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden transition hover:shadow-md';
-            
             const borderColor = type === 'web' ? 'border-l-4 border-l-brand-teal' : 'border-l-4 border-l-yellow-400';
             wrapper.classList.add(...borderColor.split(' '));
-
             const uniqueId = `area-${zone.id}`;
 
             wrapper.innerHTML = `
@@ -447,7 +421,6 @@ AdButler.ads.push({handler: function(opt){ AdButler.register(${pubId}, ${zone.id
             return wrapper;
         }
 
-        // --- MOCK DATA ---
         function generateMockZones(pubId) {
             return [
                 { id: 101, name: "Homepage Leaderboard", type: "website", width: 728, height: 90 },
@@ -458,8 +431,6 @@ AdButler.ads.push({handler: function(opt){ AdButler.register(${pubId}, ${zone.id
             ];
         }
 
-        // --- UTILS ---
-        
         function setStatus(msg, type) {
             statusMessage.textContent = msg;
             statusIndicator.className = `w-3 h-3 rounded-full mr-3 ${type === 'success' ? 'bg-green-400' : (type === 'error' ? 'bg-red-500' : 'bg-gray-400')}`;
@@ -487,19 +458,14 @@ AdButler.ads.push({handler: function(opt){ AdButler.register(${pubId}, ${zone.id
             } else {
                 toast.querySelector('i').className = "fa-solid fa-circle-check text-green-400 mr-3";
             }
-            
             setTimeout(() => {
                 toast.classList.remove('opacity-100', 'translate-y-0');
                 toast.classList.add('opacity-0', 'translate-y-20');
             }, 3000);
         }
 
-        // --- EVENT LISTENERS ---
-        
-        // Fetch
         fetchButton.addEventListener('click', fetchZones);
         
-        // Live updates for configuration changes
         tagTypeSelect.addEventListener('change', () => {
             if(currentZones.length) {
                 renderAllTags();
@@ -509,11 +475,10 @@ AdButler.ads.push({handler: function(opt){ AdButler.register(${pubId}, ${zone.id
 
         euidInput.addEventListener('input', () => {
             if(currentZones.length) {
-                renderAllTags(); // Re-render email tags in real-time
+                renderAllTags(); 
             }
         });
 
-        // Global Copy Helpers
         window.copyToClipboard = function(elementId) {
             const el = document.getElementById(elementId);
             el.select();
@@ -528,7 +493,6 @@ AdButler.ads.push({handler: function(opt){ AdButler.register(${pubId}, ${zone.id
                 const name = area.closest('.bg-white').querySelector('h4').textContent;
                 textBuffer += `<!-- ${name} -->\n${area.value}\n\n`;
             });
-            
             const temp = document.createElement('textarea');
             temp.value = textBuffer;
             document.body.appendChild(temp);
