@@ -38,38 +38,31 @@
             </div>
             <div class="mt-4 md:mt-0 text-right">
                 <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-semibold uppercase tracking-wide">
-                    v4.1 (ESP Presets)
+                    v5.0 (Manual ID)
                 </span>
             </div>
         </div>
 
-        <!-- STEP 1: CONNECT -->
-        <div id="step1" class="mb-8 p-6 bg-blue-50 border border-blue-100 rounded-xl">
-            <h3 class="text-lg font-bold text-brand-navy mb-2">1. Connect to AdButler</h3>
-            <p class="text-sm text-gray-600 mb-4">Click below to verify your API key and load all publications under your parent account.</p>
-            <button id="connectButton" class="btn-primary py-2 px-6 rounded-lg font-bold shadow-md flex items-center">
-                <i class="fa-solid fa-link mr-2"></i> Connect & Load Publications
-            </button>
-            <p id="connectionStatus" class="mt-3 text-sm font-medium text-gray-500"></p>
-        </div>
-
-        <!-- STEP 2: SELECT PUBLICATION (Hidden initially) -->
-        <div id="step2" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 opacity-50 pointer-events-none transition-opacity duration-300">
+        <!-- CONFIGURATION GRID -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <!-- PUB ID INPUT -->
             <div class="lg:col-span-1 space-y-4">
-                <h3 class="font-bold text-brand-navy border-b pb-2">2. Select Publication</h3>
+                <h3 class="font-bold text-brand-navy border-b pb-2">1. Publication</h3>
                 
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Publication</label>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Publisher ID</label>
                     <div class="relative">
-                        <select id="publisherSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-teal focus:border-brand-teal outline-none transition text-brand-navy bg-white">
-                            <option value="">Select a publication...</option>
-                        </select>
+                        <input type="text" id="publisherId" placeholder="e.g. 185279" 
+                            class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-teal focus:border-brand-teal outline-none transition text-brand-navy font-mono">
+                        <i class="fa-solid fa-id-badge absolute left-3 top-3.5 text-gray-400"></i>
                     </div>
                 </div>
             </div>
 
+            <!-- SETTINGS -->
             <div class="lg:col-span-2 space-y-4">
-                <h3 class="font-bold text-brand-navy border-b pb-2">3. Tag Settings</h3>
+                <h3 class="font-bold text-brand-navy border-b pb-2">2. Tag Settings</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Web Settings -->
                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -83,8 +76,6 @@
                     <!-- Email Settings -->
                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                         <h4 class="text-sm font-semibold text-brand-yellow text-yellow-700 mb-3">Email Tags</h4>
-                        
-                        <!-- NEW DROPDOWN -->
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Email Service Provider</label>
                         <select id="euidSelect" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-white font-mono text-gray-700 focus:ring-2 focus:ring-brand-yellow focus:border-brand-yellow outline-none">
                             <option value="">Select Platform...</option>
@@ -95,20 +86,17 @@
                             <option value="{{emailnum}}{{time()}}">Sailthrough</option>
                             <option value="custom">Custom / Other...</option>
                         </select>
-
-                        <!-- HIDDEN CUSTOM INPUT -->
                         <input type="text" id="euidCustomInput" placeholder="Enter custom variable..." class="hidden mt-2 w-full p-2.5 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-brand-yellow focus:border-brand-yellow outline-none">
-                        
-                        <p class="text-xs text-gray-400 mt-2">Sets the unique tracking variable (EUID/ORD).</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- FETCH ACTION -->
-        <div id="actionArea" class="hidden flex items-center justify-between bg-brand-navy p-4 rounded-lg shadow-lg mb-6">
+        <div class="flex items-center justify-between bg-brand-navy p-4 rounded-lg shadow-lg mb-6">
             <div class="flex items-center text-white">
-                <span class="text-sm font-medium text-gray-200">Publication Selected. Ready to process.</span>
+                <div id="statusIndicator" class="w-3 h-3 rounded-full bg-gray-400 mr-3"></div>
+                <span id="statusMessage" class="text-sm font-medium text-gray-200">Ready to fetch.</span>
             </div>
             <button id="fetchZonesButton" class="btn-primary py-2 px-6 rounded-lg font-bold shadow-lg flex items-center">
                 <i class="fa-solid fa-bolt mr-2"></i> Get Zone Tags
@@ -116,7 +104,7 @@
         </div>
 
         <!-- RESULTS -->
-        <div id="resultsContainer" class="hidden space-y-8">
+        <div id="resultsContainer" class="hidden space-y-8 animate-fade-in-up">
              <!-- Global Header Script -->
              <div class="bg-yellow-50 border border-yellow-200 rounded-xl overflow-hidden shadow-sm">
                 <div class="bg-yellow-100 px-6 py-3 border-b border-yellow-200 flex justify-between items-center">
@@ -149,11 +137,7 @@
         const WORKER_URL = 'https://adbutler-proxy.allison-9f0.workers.dev/'; 
 
         // --- ELEMENTS ---
-        const connectButton = document.getElementById('connectButton');
-        const connectionStatus = document.getElementById('connectionStatus');
-        const step2 = document.getElementById('step2');
-        const publisherSelect = document.getElementById('publisherSelect');
-        const actionArea = document.getElementById('actionArea');
+        const publisherIdInput = document.getElementById('publisherId');
         const fetchZonesButton = document.getElementById('fetchZonesButton');
         const resultsContainer = document.getElementById('resultsContainer');
         const websiteTagsContainer = document.getElementById('websiteTagsContainer');
@@ -162,92 +146,40 @@
         const tagTypeSelect = document.getElementById('tagTypeSelect');
         const euidSelect = document.getElementById('euidSelect');
         const euidCustomInput = document.getElementById('euidCustomInput');
+        const statusMessage = document.getElementById('statusMessage');
+        const statusIndicator = document.getElementById('statusIndicator');
         
         let currentZones = [];
 
-        // --- STEP 1: CONNECT & LIST PUBLISHERS ---
-        connectButton.addEventListener('click', async () => {
-            connectButton.disabled = true;
-            connectButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Connecting...';
-            connectionStatus.textContent = "Authenticating with AdButler...";
-            connectionStatus.className = "mt-3 text-sm font-medium text-blue-600";
-
-            try {
-                // Call Worker with action=get_publishers
-                const response = await fetch(`${WORKER_URL}?action=get_publishers`);
-                const data = await response.json();
-
-                if (!response.ok) throw new Error(data.error || 'Connection Failed');
-
-                // Populate Dropdown
-                const publishers = data.data || [];
-                publisherSelect.innerHTML = '<option value="">Select a publication...</option>';
-                
-                // Sort alphabetically
-                publishers.sort((a, b) => a.name.localeCompare(b.name));
-                
-                publishers.forEach(pub => {
-                    const option = document.createElement('option');
-                    option.value = pub.id;
-                    option.textContent = `${pub.name} (ID: ${pub.id})`;
-                    publisherSelect.appendChild(option);
-                });
-
-                // Success State
-                connectionStatus.textContent = `Success! Found ${publishers.length} publications.`;
-                connectionStatus.className = "mt-3 text-sm font-medium text-green-600";
-                connectButton.innerHTML = '<i class="fa-solid fa-check mr-2"></i> Connected';
-                
-                // Unlock Step 2
-                step2.classList.remove('hidden', 'opacity-50', 'pointer-events-none');
-                step2.classList.add('opacity-100');
-
-            } catch (error) {
-                console.error(error);
-                connectionStatus.textContent = `Error: ${error.message}`;
-                connectionStatus.className = "mt-3 text-sm font-medium text-red-600";
-                connectButton.disabled = false;
-                connectButton.innerHTML = '<i class="fa-solid fa-rotate-right mr-2"></i> Retry Connection';
-            }
-        });
-
-        // --- STEP 2: HANDLE UI EVENTS ---
-        
-        // Show Fetch button when publisher selected
-        publisherSelect.addEventListener('change', () => {
-            if (publisherSelect.value) {
-                actionArea.classList.remove('hidden');
-            } else {
-                actionArea.classList.add('hidden');
-            }
-        });
-
-        // Toggle Custom Input
+        // --- UI EVENTS ---
         euidSelect.addEventListener('change', () => {
             if (euidSelect.value === 'custom') {
                 euidCustomInput.classList.remove('hidden');
             } else {
                 euidCustomInput.classList.add('hidden');
             }
-            // Live update if data exists
             if (currentZones.length > 0) renderTags();
         });
 
-        // Live update on settings change
         euidCustomInput.addEventListener('input', () => { if (currentZones.length > 0) renderTags(); });
         tagTypeSelect.addEventListener('change', () => { if (currentZones.length > 0) renderTags(); });
 
-
-        // --- STEP 3: FETCH ZONES ---
+        // --- FETCH LOGIC ---
         fetchZonesButton.addEventListener('click', async () => {
-            const pubId = publisherSelect.value;
+            const pubId = publisherIdInput.value.trim();
+            if (!pubId) {
+                alert("Please enter a Publisher ID");
+                return;
+            }
+
             fetchZonesButton.disabled = true;
             fetchZonesButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Fetching Zones...';
+            setStatus('Connecting...', 'neutral');
             resultsContainer.classList.add('hidden');
 
             try {
-                // Call Worker with action=get_zones
-                const response = await fetch(`${WORKER_URL}?action=get_zones&publisher_id=${pubId}`);
+                // Call Worker - SIMPLE ID FETCH
+                const response = await fetch(`${WORKER_URL}?publisher_id=${pubId}`);
                 const data = await response.json();
 
                 if (!response.ok) throw new Error(data.error || 'Fetch Failed');
@@ -255,19 +187,23 @@
                 currentZones = data.data || [];
                 renderTags();
                 
+                setStatus('Success!', 'success');
                 resultsContainer.classList.remove('hidden');
-                fetchZonesButton.innerHTML = '<i class="fa-solid fa-bolt mr-2"></i> Get Zone Tags';
-                fetchZonesButton.disabled = false;
                 
-                // Scroll to results
-                resultsContainer.scrollIntoView({ behavior: 'smooth' });
-
             } catch (error) {
+                console.error(error);
+                setStatus('Error', 'error');
                 alert(`Error fetching zones: ${error.message}`);
-                fetchZonesButton.disabled = false;
+            } finally {
                 fetchZonesButton.innerHTML = '<i class="fa-solid fa-bolt mr-2"></i> Get Zone Tags';
+                fetchZonesButton.disabled = false;
             }
         });
+
+        function setStatus(msg, type) {
+            statusMessage.textContent = msg;
+            statusIndicator.className = `w-3 h-3 rounded-full mr-3 ${type === 'success' ? 'bg-green-400' : (type === 'error' ? 'bg-red-500' : 'bg-gray-400')}`;
+        }
 
         // --- RENDER LOGIC ---
         function renderTags() {
@@ -275,17 +211,15 @@
             emailTagsContainer.innerHTML = '';
             
             const webType = tagTypeSelect.value;
-            const pubId = publisherSelect.value;
+            const pubId = publisherIdInput.value.trim();
 
-            // Determine EUID Value
             let euid = euidSelect.value;
             if (euid === 'custom') {
                 euid = euidCustomInput.value.trim();
             }
             if (!euid) euid = '[EUID_PLACEHOLDER]';
 
-
-            // Set Global Header
+            // Global Header
             globalHeaderScript.value = `<script type="text/javascript">
 if (!window.AdButler){
     (function(){
@@ -298,7 +232,6 @@ if (!window.AdButler){
 
             currentZones.forEach(zone => {
                 if (zone.type === 'banner' || zone.type === 'website') {
-                    // Generate CLEANED tag locally
                     const divId = `placement_${zone.id}_0`;
                     let code = '';
                     
@@ -310,7 +243,6 @@ if (!window.AdButler){
     AdButler.ads.push({handler: function(opt){ AdButler.register(${pubId}, ${zone.id}, [${zone.width},${zone.height}], '${divId}', opt); }, opt: { place: 0, keywords: '', domain: '${DOMAIN}', click: 'CLICK_MACRO_PLACEHOLDER' }});
 <\/script>`;
                     } else {
-                        // Standard Fallback
                          code = `<!-- AdButler Zone: ${zone.name} -->
 <script type="text/javascript">
 var AdButler = AdButler || {}; AdButler.ads = AdButler.ads || [];
@@ -345,7 +277,6 @@ AdButler.ads.push({handler: function(opt){ AdButler.register(${pubId}, ${zone.id
             return wrapper;
         }
 
-        // --- UTILS ---
         window.copyToClipboard = function(id) {
             document.getElementById(id).select();
             document.execCommand('copy');
