@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdButler Implementation Toolkit</title>
+    <!-- Load Tailwind CSS for modern, responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Style for the 'Advertisement' label */
+        .ad-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #4b5563; /* gray-600 */
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+        /* Styling for the responsive wrapper */
+        .responsive-ad-wrapper {
+            max-width: 100%;
+            height: auto;
+            margin: 1rem 0;
+            padding: 1rem;
+            border: 1px solid #d1d5db; /* gray-300 */
+            border-radius: 0.5rem;
+            background-color: #f9fafb; /* gray-50 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 sm:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-6 md:p-10">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Implementation Tag Builder</h1>
+        <p class="text-gray-600 mb-6">Enter the Publisher ID to fetch, modify, and collect all website and email zone tags.</p>
+
+        <!-- Input and Action Controls -->
+        <div class="flex flex-col md:flex-row gap-4 mb-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <input type="text" id="publisherId" placeholder="Enter AdButler Publisher ID (e.g., 123456)"
+                   class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm text-gray-700">
+            <button id="fetchButton"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-200 disabled:opacity-50">
+                Fetch & Process Tags
+            </button>
+        </div>
+
+        <!-- Status and Loading Indicator -->
+        <p id="statusMessage" class="text-sm text-red-600 mb-4 h-5"></p>
+
+        <!-- Results Section -->
+        <div id="resultsContainer" class="space-y-10 hidden">
+
+            <!-- Website Tags Section -->
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+                    Website Ad Zones (Header Script Assumed)
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                </h2>
+                <p class="text-sm text-gray-500 mb-4">
+                    The tags below are modified:
+                    <ul class="list-disc list-inside ml-4">
+                        <li>The main AdButler JS library call is REMOVED (assumes it's in the website header).</li>
+                        <li>Wrapped for responsiveness and includes the "Advertisement" label.</li>
+                    </ul>
+                </p>
+                <div id="websiteTagsOutput" class="space-y-6">
+                    <!-- Website tags will be injected here -->
+                </div>
+                <button onclick="copyAllTags('websiteTagsOutput')" class="mt-4 text-sm font-medium text-blue-600 hover:text-blue-800 transition duration-150">
+                    Copy All Website Tags
+                </button>
+            </div>
+
+            <hr class="border-gray-300">
+
+            <!-- Email Tags Section -->
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+                    Email Newsletter Zones (EUID Placeholder Added)
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                    </svg>
+                </h2>
+                <p class="text-sm text-gray-500 mb-4">
+                    The tags below include the necessary **`[EUID_PLACEHOLDER]`** which you must replace with the email platform's unique user identifier variable (e.g., ActiveCampaign's `%CONTACTID%` or Cakemail's equivalent).
+                </p>
+                <div id="emailTagsOutput" class="space-y-6">
+                    <!-- Email tags will be injected here -->
+                </div>
+                <button onclick="copyAllTags('emailTagsOutput')" class="mt-4 text-sm font-medium text-blue-600 hover:text-blue-800 transition duration-150">
+                    Copy All Email Tags
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const API_KEY = ""; // Replace with your actual AdButler API key or token
+        const API_ENDPOINT = 'https://api.adbutler.com/v1/zones'; // Replace with your actual API endpoint
+
+        const fetchButton = document.getElementById('fetchButton');
+        const publisherIdInput = document.getElementById('publisherId');
+        const statusMessage = document.getElementById('statusMessage');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const websiteTagsOutput = document.getElementById('websiteTagsOutput');
+        const emailTagsOutput = document.getElementById('emailTagsOutput');
+        
+        // Helper function for exponential backoff retry logic
+        async function fetchWithRetry(url, options, retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        if (response.status === 429 && i < retries - 1) { // Too Many Requests
+                            const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            continue;
+                        }
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response;
+                } catch (error) {
+                    if (i === retries - 1) throw error;
+                    // Exponential backoff delay happens in the try block
+                }
+            }
+        }
+
+        /**
+         * Simulates fetching data from the AdButler API.
+         * REPLACE THIS FUNCTION with your actual authenticated API call logic.
+         */
+        async function fetchAdButlerZones(publisherId) {
+            // --- ACTUAL API CALL LOGIC ---
+            // const url = `${API_ENDPOINT}?publisherId=${publisherId}`;
+            // const options = {
+            //     method: 'GET',
+            //     headers: {
+            //         'Authorization': `Bearer ${API_KEY}`, // Or whatever authentication method AdButler uses
+            //         'Content-Type': 'application/json'
+            //     }
+            // };
+            // const response = await fetchWithRetry(url, options);
+            // const data = await response.json();
+            // return data.zones;
+            // -----------------------------
+
+            // --- MOCK DATA FOR DEMONSTRATION ---
+            statusMessage.textContent = 'Simulating API call and processing zones...';
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate network latency
+
+            const mockZones = [
+                { id: 123, name: "Homepage Leaderboard", type: "website", width: 728, height: 90 },
+                { id: 124, name: "Article Sidebar (300x250)", type: "website", width: 300, height: 250 },
+                { id: 125, name: "In-Content Unit", type: "website", width: 600, height: 300 },
+                { id: 401, name: "Newsletter Top Banner", type: "email", width: 600, height: 90 },
+                { id: 402, name: "Newsletter Bottom Rectangle", type: "email", width: 300, height: 250 },
+            ];
+
+            // FIX: Using string concatenation with explicit '\n' instead of multiline template literals
+            // for the raw tags to prevent SyntaxErrors in some environments.
+            return mockZones.map(zone => {
+                const rawTag = zone.type === 'website' 
+                    ? '<!-- AdButler Zone ' + zone.id + ': ' + zone.name + ' -->\n' +
+                      '<div id="adbutler-zone-' + zone.id + '"></div>\n' +
+                      '<script type="text/javascript" src="https://servedbyadbutler.com/app.js"></script>\n' +
+                      '<script type="text/javascript">\n' +
+                      '    adbutler.optimize.fetch({\n' +
+                      '        zone: ' + zone.id + ',\n' +
+                      '        width: ' + zone.width + ',\n' +
+                      '        height: ' + zone.height + ',\n' +
+                      "        type: 'async'\n" +
+                      '    });\n' +
+                      '</script>'
+                    : '<!-- AdButler Email Zone ' + zone.id + ': ' + zone.name + ' -->\n' +
+                      '<a href="https://servedbyadbutler.com/cl.srv?sid=12345&pub=99999&zone=' + zone.id + '&pid=0&ord=[EUID_PLACEHOLDER]" target="_blank" rel="noopener">\n' +
+                      '    <img src="https://servedbyadbutler.com/ad.srv?sid=12345&pub=99999&zone=' + zone.id + '&pid=0&ord=[EUID_PLACEHOLDER]" alt="' + zone.name + '" border="0" width="' + zone.width + '" height="' + zone.height + '">\n' +
+                      '</a>';
+                
+                return {
+                    ...zone,
+                    rawTag: rawTag
+                };
+            });
+        }
+
+        /**
+         * Cleans and wraps the website ad zone tag as requested.
+         */
+        function processWebsiteTag(zone) {
+            let processedTag = zone.rawTag;
+
+            // 1. Remove the JS library call
+            // We are looking for the common library load script.
+            const jsLibRegex = /<script\s+[^>]*src=["']https:\/\/servedbyadbutler\.com\/app\.js["'][^>]*><\/script>/gi;
+            processedTag = processedTag.replace(jsLibRegex, '');
+
+            // 2. Add wrapper for responsiveness and 'Advertisement' label
+            // FIX: Converting template literal to string concatenation
+            const indent = '        ';
+            const indentedProcessedTag = processedTag.trim().split('\n').map(line => indent + line).join('\n');
+
+            const wrappedTag = 
+                '<div class="responsive-ad-wrapper">\n' +
+                '    <!-- Zone: ' + zone.name + ' (' + zone.width + 'x' + zone.height + ') -->\n' +
+                '    <div class="ad-label">Advertisement</div>\n' +
