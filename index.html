@@ -27,6 +27,7 @@
 
     <div class="max-w-6xl mx-auto bg-white shadow-2xl rounded-xl p-6 md:p-10">
         
+        <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b pb-6">
             <div>
                 <h1 class="text-3xl font-bold text-brand-navy mb-2">
@@ -42,53 +43,61 @@
             </div>
         </div>
 
+        <!-- CONFIGURATION GRID -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             
+            <!-- PUB ID INPUT -->
             <div class="lg:col-span-1 space-y-4">
                 <h3 class="font-bold text-brand-navy border-b pb-2">1. Publication</h3>
                 
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Publisher ID</label>
+                <!-- Wrapped in card to align vertically with Tag Settings cards -->
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h4 class="text-sm font-semibold text-brand-teal mb-3">Publisher ID</h4>
                     <div class="relative">
                         <input type="text" id="publisherId" placeholder="e.g. 185279" 
                             class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-teal focus:border-brand-teal outline-none transition text-brand-navy font-mono">
                         <i class="fa-solid fa-id-badge absolute left-3 top-3.5 text-gray-400"></i>
                     </div>
+                    <!-- TEST CONNECTION LINK (Visual Only) -->
                     <button class="mt-2 text-xs text-brand-teal hover:underline flex items-center">
                         <i class="fa-solid fa-stethoscope mr-1"></i> Verify API Key Permissions
                     </button>
                 </div>
             </div>
 
+            <!-- SETTINGS -->
             <div class="lg:col-span-2 space-y-4">
                 <h3 class="font-bold text-brand-navy border-b pb-2">2. Tag Settings</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Web Settings -->
                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                         <h4 class="text-sm font-semibold text-brand-teal mb-3">Website Tags</h4>
                         <select class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-white">
-                            <option value="async">Async JavaScript (Recommended)</option>
+                            <option value="async">Async JavaScript</option>
                             <option value="standard">Standard JavaScript</option>
-                            <option value="async_1_1">Async 1.1</option>
+                            <option value="async_1_1" selected>Async 1.1</option>
                         </select>
                     </div>
+                    <!-- Email Settings -->
                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <h4 class="text-sm font-semibold text-brand-yellow text-yellow-700 mb-3">Email Tags</h4>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Email Service Provider</label>
+                        <h4 class="text-sm font-semibold text-brand-teal mb-3">Email Tags</h4>
                         <select class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-white font-mono text-gray-700 focus:ring-2 focus:ring-brand-yellow focus:border-brand-yellow outline-none">
                             <option value="">Select Platform...</option>
-                            <option value="M_[MAILING_ID]-S_[id]">Cakemail</option>
+                            <option value="M_[MAILING_ID]-S_[id]" selected>Cakemail</option>
                             <option value="%SUBSCRIBERID%%MESSAGEID%">ActiveCampaign</option>
                             <option value="{{contact.firstname}}{{contact.hs_object_id}}">HubSpot</option>
                             <option value="*|CAMPAIGN_UID|*-*|UNIQID|*">MailChimp</option>
                             <option value="{{emailnum}}{{time()}}">Sailthrough</option>
                             <option value="custom">Custom / Other...</option>
                         </select>
+                        <!-- Custom Input (Hidden by default, can be toggled via CSS for design testing) -->
                         <input type="text" placeholder="Enter custom variable..." class="hidden mt-2 w-full p-2.5 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-brand-yellow focus:border-brand-yellow outline-none">
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- FETCH ACTION -->
         <div class="flex items-center justify-between bg-brand-navy p-4 rounded-lg shadow-lg mb-6">
             <div class="flex items-center text-white">
                 <div class="w-3 h-3 rounded-full bg-gray-400 mr-3"></div>
@@ -99,8 +108,10 @@
             </button>
         </div>
 
+        <!-- RESULTS (Mocked for UI Design) -->
         <div id="resultsContainer" class="space-y-8 animate-fade-in-up">
             
+             <!-- Global Header Script (Static Mock) -->
              <div class="bg-yellow-50 border border-yellow-200 rounded-xl overflow-hidden shadow-sm">
                 <div class="bg-yellow-100 px-6 py-3 border-b border-yellow-200 flex justify-between items-center">
                     <h3 class="font-bold text-yellow-800 flex items-center"><i class="fa-solid fa-code mr-2"></i> Global Header Script</h3>
@@ -123,14 +134,17 @@ if (!window.AdButler){
                 </div>
             </div>
 
+            <!-- Website Tag Container (Static Mock) -->
             <div id="websiteTagsContainer" class="grid grid-cols-1 gap-6">
+                <!-- Mock Web Card -->
                 <div class="bg-white rounded-lg border shadow-sm overflow-hidden border-l-4 border-l-brand-teal">
                     <div class="p-4 border-b flex justify-between items-center bg-gray-50">
                         <div><h4 class="font-bold text-gray-800">Homepage Leaderboard</h4><span class="text-xs text-gray-500">ID: 123456 | 728x90</span></div>
                         <button class="text-gray-400 hover:text-brand-teal"><i class="fa-regular fa-copy fa-lg"></i></button>
                     </div>
                     <div class="p-0">
-                        <textarea readonly class="w-full h-32 p-4 text-xs font-mono bg-white text-gray-600 focus:outline-none resize-y block border-none"><div id="placement_123456_0" class="adbutler-zone" style="min-height:90px; width:100%; max-width:728px; margin: 0 auto;"></div>
+                        <textarea readonly class="w-full h-32 p-4 text-xs font-mono bg-white text-gray-600 focus:outline-none resize-y block border-none"><!-- AdButler Zone: Homepage Leaderboard -->
+<div id="placement_123456_0" class="adbutler-zone" style="min-height:90px; width:100%; max-width:728px; margin: 0 auto;"></div>
 <script type="text/javascript">
     var AdButler = AdButler || {}; AdButler.ads = AdButler.ads || [];
     AdButler.ads.push({handler: function(opt){ AdButler.register(10000, 123456, [728,90], 'placement_123456_0', opt); }, opt: { place: 0, keywords: '', domain: 'servedby.indiegraf.com', click: 'CLICK_MACRO_PLACEHOLDER' }});
@@ -139,14 +153,17 @@ if (!window.AdButler){
                 </div>
             </div>
 
+            <!-- Email Tag Container (Static Mock) -->
             <div id="emailTagsContainer" class="grid grid-cols-1 gap-6">
+                <!-- Mock Email Card -->
                 <div class="bg-white rounded-lg border shadow-sm overflow-hidden border-l-4 border-l-yellow-400">
                     <div class="p-4 border-b flex justify-between items-center bg-gray-50">
                         <div><h4 class="font-bold text-gray-800">Newsletter Top Banner</h4><span class="text-xs text-gray-500">ID: 987654 | 600x250</span></div>
                         <button class="text-gray-400 hover:text-brand-teal"><i class="fa-regular fa-copy fa-lg"></i></button>
                     </div>
                     <div class="p-0">
-                        <textarea readonly class="w-full h-32 p-4 text-xs font-mono bg-white text-gray-600 focus:outline-none resize-y block border-none"><a href="https://servedby.indiegraf.com/cl.srv?sid=10000&zone=987654&pid=0&ord=[EUID]" target="_blank">
+                        <textarea readonly class="w-full h-32 p-4 text-xs font-mono bg-white text-gray-600 focus:outline-none resize-y block border-none"><!-- Email Zone: Newsletter Top Banner -->
+<a href="https://servedby.indiegraf.com/cl.srv?sid=10000&zone=987654&pid=0&ord=[EUID]" target="_blank">
     <img src="https://servedby.indiegraf.com/ad.srv?sid=10000&zone=987654&pid=0&ord=[EUID]" alt="Newsletter Top Banner" width="600" height="250" style="display:block; max-width:100%; height:auto; border:0;">
 </a></textarea>
                     </div>
@@ -155,6 +172,7 @@ if (!window.AdButler){
         </div>
     </div>
 
+    <!-- Notification Toast (Static for Design) -->
     <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-xl opacity-0 transition-all duration-300 z-50 flex items-center">
         <i class="fa-solid fa-circle-check text-green-400 mr-3"></i><span>Copied to clipboard</span>
     </div>
