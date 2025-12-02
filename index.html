@@ -27,7 +27,6 @@
 
     <div class="max-w-6xl mx-auto bg-white shadow-2xl rounded-xl p-6 md:p-10">
         
-        <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b pb-6">
             <div>
                 <h1 class="text-3xl font-bold text-brand-navy mb-2">
@@ -38,15 +37,13 @@
             </div>
             <div class="mt-4 md:mt-0 text-right">
                 <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-semibold uppercase tracking-wide">
-                    v5.1 (Connection Test)
+                    UI Design Mode
                 </span>
             </div>
         </div>
 
-        <!-- CONFIGURATION GRID -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             
-            <!-- PUB ID INPUT -->
             <div class="lg:col-span-1 space-y-4">
                 <h3 class="font-bold text-brand-navy border-b pb-2">1. Publication</h3>
                 
@@ -57,32 +54,27 @@
                             class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-teal focus:border-brand-teal outline-none transition text-brand-navy font-mono">
                         <i class="fa-solid fa-id-badge absolute left-3 top-3.5 text-gray-400"></i>
                     </div>
-                    <!-- TEST CONNECTION LINK -->
-                    <button id="testConnectionBtn" class="mt-2 text-xs text-brand-teal hover:underline flex items-center">
+                    <button class="mt-2 text-xs text-brand-teal hover:underline flex items-center">
                         <i class="fa-solid fa-stethoscope mr-1"></i> Verify API Key Permissions
                     </button>
-                    <p id="testStatus" class="text-xs mt-1 font-medium hidden"></p>
                 </div>
             </div>
 
-            <!-- SETTINGS -->
             <div class="lg:col-span-2 space-y-4">
                 <h3 class="font-bold text-brand-navy border-b pb-2">2. Tag Settings</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Web Settings -->
                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                         <h4 class="text-sm font-semibold text-brand-teal mb-3">Website Tags</h4>
-                        <select id="tagTypeSelect" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-white">
+                        <select class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-white">
                             <option value="async">Async JavaScript (Recommended)</option>
                             <option value="standard">Standard JavaScript</option>
                             <option value="async_1_1">Async 1.1</option>
                         </select>
                     </div>
-                    <!-- Email Settings -->
                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
                         <h4 class="text-sm font-semibold text-brand-yellow text-yellow-700 mb-3">Email Tags</h4>
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Email Service Provider</label>
-                        <select id="euidSelect" class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-white font-mono text-gray-700 focus:ring-2 focus:ring-brand-yellow focus:border-brand-yellow outline-none">
+                        <select class="w-full p-2.5 border border-gray-300 rounded-lg text-sm bg-white font-mono text-gray-700 focus:ring-2 focus:ring-brand-yellow focus:border-brand-yellow outline-none">
                             <option value="">Select Platform...</option>
                             <option value="M_[MAILING_ID]-S_[id]">Cakemail</option>
                             <option value="%SUBSCRIBERID%%MESSAGEID%">ActiveCampaign</option>
@@ -91,26 +83,24 @@
                             <option value="{{emailnum}}{{time()}}">Sailthrough</option>
                             <option value="custom">Custom / Other...</option>
                         </select>
-                        <input type="text" id="euidCustomInput" placeholder="Enter custom variable..." class="hidden mt-2 w-full p-2.5 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-brand-yellow focus:border-brand-yellow outline-none">
+                        <input type="text" placeholder="Enter custom variable..." class="hidden mt-2 w-full p-2.5 border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-brand-yellow focus:border-brand-yellow outline-none">
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- FETCH ACTION -->
         <div class="flex items-center justify-between bg-brand-navy p-4 rounded-lg shadow-lg mb-6">
             <div class="flex items-center text-white">
-                <div id="statusIndicator" class="w-3 h-3 rounded-full bg-gray-400 mr-3"></div>
-                <span id="statusMessage" class="text-sm font-medium text-gray-200">Ready to fetch.</span>
+                <div class="w-3 h-3 rounded-full bg-gray-400 mr-3"></div>
+                <span class="text-sm font-medium text-gray-200">Ready to fetch.</span>
             </div>
-            <button id="fetchZonesButton" class="btn-primary py-2 px-6 rounded-lg font-bold shadow-lg flex items-center">
+            <button class="btn-primary py-2 px-6 rounded-lg font-bold shadow-lg flex items-center">
                 <i class="fa-solid fa-bolt mr-2"></i> Get Zone Tags
             </button>
         </div>
 
-        <!-- RESULTS -->
-        <div id="resultsContainer" class="hidden space-y-8 animate-fade-in-up">
-             <!-- Global Header Script -->
+        <div id="resultsContainer" class="space-y-8 animate-fade-in-up">
+            
              <div class="bg-yellow-50 border border-yellow-200 rounded-xl overflow-hidden shadow-sm">
                 <div class="bg-yellow-100 px-6 py-3 border-b border-yellow-200 flex justify-between items-center">
                     <h3 class="font-bold text-yellow-800 flex items-center"><i class="fa-solid fa-code mr-2"></i> Global Header Script</h3>
@@ -119,209 +109,55 @@
                 <div class="p-6">
                     <p class="text-sm text-gray-700 mb-3">Place this <strong>once</strong> in the <code>&lt;head&gt;</code> of your website.</p>
                     <div class="relative group">
-                        <textarea readonly id="globalHeaderScript" class="w-full h-32 p-4 text-xs md:text-sm font-mono bg-white border border-yellow-300 rounded-lg text-gray-700 focus:outline-none"></textarea>
-                        <button onclick="copyToClipboard('globalHeaderScript')" class="absolute top-2 right-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 p-2 rounded transition"><i class="fa-regular fa-copy"></i></button>
+                        <textarea readonly class="w-full h-32 p-4 text-xs md:text-sm font-mono bg-white border border-yellow-300 rounded-lg text-gray-700 focus:outline-none"><script type="text/javascript">
+if (!window.AdButler){
+    (function(){
+        var s = document.createElement("script"); s.async = true; s.type = "text/javascript"; 
+        s.src = 'https://servedby.indiegraf.com/app.js'; 
+        var n = document.getElementsByTagName("script")[0]; n.parentNode.insertBefore(s, n);
+    }());
+}
+</script></textarea>
+                        <button class="absolute top-2 right-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 p-2 rounded transition"><i class="fa-regular fa-copy"></i></button>
                     </div>
                 </div>
             </div>
 
-            <div id="websiteTagsContainer" class="grid grid-cols-1 gap-6"></div>
-            <div id="emailTagsContainer" class="grid grid-cols-1 gap-6"></div>
+            <div id="websiteTagsContainer" class="grid grid-cols-1 gap-6">
+                <div class="bg-white rounded-lg border shadow-sm overflow-hidden border-l-4 border-l-brand-teal">
+                    <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+                        <div><h4 class="font-bold text-gray-800">Homepage Leaderboard</h4><span class="text-xs text-gray-500">ID: 123456 | 728x90</span></div>
+                        <button class="text-gray-400 hover:text-brand-teal"><i class="fa-regular fa-copy fa-lg"></i></button>
+                    </div>
+                    <div class="p-0">
+                        <textarea readonly class="w-full h-32 p-4 text-xs font-mono bg-white text-gray-600 focus:outline-none resize-y block border-none"><div id="placement_123456_0" class="adbutler-zone" style="min-height:90px; width:100%; max-width:728px; margin: 0 auto;"></div>
+<script type="text/javascript">
+    var AdButler = AdButler || {}; AdButler.ads = AdButler.ads || [];
+    AdButler.ads.push({handler: function(opt){ AdButler.register(10000, 123456, [728,90], 'placement_123456_0', opt); }, opt: { place: 0, keywords: '', domain: 'servedby.indiegraf.com', click: 'CLICK_MACRO_PLACEHOLDER' }});
+</script></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div id="emailTagsContainer" class="grid grid-cols-1 gap-6">
+                <div class="bg-white rounded-lg border shadow-sm overflow-hidden border-l-4 border-l-yellow-400">
+                    <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+                        <div><h4 class="font-bold text-gray-800">Newsletter Top Banner</h4><span class="text-xs text-gray-500">ID: 987654 | 600x250</span></div>
+                        <button class="text-gray-400 hover:text-brand-teal"><i class="fa-regular fa-copy fa-lg"></i></button>
+                    </div>
+                    <div class="p-0">
+                        <textarea readonly class="w-full h-32 p-4 text-xs font-mono bg-white text-gray-600 focus:outline-none resize-y block border-none"><a href="https://servedby.indiegraf.com/cl.srv?sid=10000&zone=987654&pid=0&ord=[EUID]" target="_blank">
+    <img src="https://servedby.indiegraf.com/ad.srv?sid=10000&zone=987654&pid=0&ord=[EUID]" alt="Newsletter Top Banner" width="600" height="250" style="display:block; max-width:100%; height:auto; border:0;">
+</a></textarea>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center">
-        <i class="fa-solid fa-circle-check text-green-400 mr-3"></i><span id="toastMsg">Success</span>
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-xl opacity-0 transition-all duration-300 z-50 flex items-center">
+        <i class="fa-solid fa-circle-check text-green-400 mr-3"></i><span>Copied to clipboard</span>
     </div>
 
-    <script>
-        // --- CONFIG ---
-        const DOMAIN = 'servedby.indiegraf.com';
-        // REPLACE WITH YOUR WORKER URL
-        const WORKER_URL = 'https://adbutler-proxy.allison-9f0.workers.dev/'; 
-
-        // --- ELEMENTS ---
-        const publisherIdInput = document.getElementById('publisherId');
-        const fetchZonesButton = document.getElementById('fetchZonesButton');
-        const resultsContainer = document.getElementById('resultsContainer');
-        const websiteTagsContainer = document.getElementById('websiteTagsContainer');
-        const emailTagsContainer = document.getElementById('emailTagsContainer');
-        const globalHeaderScript = document.getElementById('globalHeaderScript');
-        const tagTypeSelect = document.getElementById('tagTypeSelect');
-        const euidSelect = document.getElementById('euidSelect');
-        const euidCustomInput = document.getElementById('euidCustomInput');
-        const statusMessage = document.getElementById('statusMessage');
-        const statusIndicator = document.getElementById('statusIndicator');
-        const testConnectionBtn = document.getElementById('testConnectionBtn');
-        const testStatus = document.getElementById('testStatus');
-        
-        let currentZones = [];
-
-        // --- UI EVENTS ---
-        euidSelect.addEventListener('change', () => {
-            if (euidSelect.value === 'custom') {
-                euidCustomInput.classList.remove('hidden');
-            } else {
-                euidCustomInput.classList.add('hidden');
-            }
-            if (currentZones.length > 0) renderTags();
-        });
-
-        euidCustomInput.addEventListener('input', () => { if (currentZones.length > 0) renderTags(); });
-        tagTypeSelect.addEventListener('change', () => { if (currentZones.length > 0) renderTags(); });
-
-        // --- TEST CONNECTION ---
-        testConnectionBtn.addEventListener('click', async () => {
-            testStatus.classList.remove('hidden');
-            testStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking permissions...';
-            testStatus.className = "text-xs mt-1 font-medium text-blue-600";
-            
-            try {
-                // Fetch without params = Get Parent Zones
-                const response = await fetch(`${WORKER_URL}`);
-                const data = await response.json();
-                
-                if(!response.ok) throw new Error(data.error || response.statusText);
-                
-                testStatus.innerHTML = '<i class="fa-solid fa-check-circle"></i> Key is VALID for Zones!';
-                testStatus.className = "text-xs mt-1 font-medium text-green-600";
-                
-                // If this works, but publisher fetch fails, it's the ID.
-                setTimeout(() => { alert("Great! Your API Key works. \n\nIf you get an error when fetching a specific publisher, it means that specific ID is incorrect or not linked to your parent account."); }, 100);
-
-            } catch (err) {
-                testStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Test Failed: ${err.message}`;
-                testStatus.className = "text-xs mt-1 font-medium text-red-600";
-            }
-        });
-
-        // --- FETCH LOGIC ---
-        fetchZonesButton.addEventListener('click', async () => {
-            const pubId = publisherIdInput.value.trim();
-            if (!pubId) {
-                alert("Please enter a Publisher ID");
-                return;
-            }
-
-            fetchZonesButton.disabled = true;
-            fetchZonesButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Fetching Zones...';
-            setStatus('Connecting...', 'neutral');
-            resultsContainer.classList.add('hidden');
-
-            try {
-                // Call Worker - SIMPLE ID FETCH
-                const response = await fetch(`${WORKER_URL}?publisher_id=${pubId}`);
-                const data = await response.json();
-
-                if (!response.ok) throw new Error(data.error || 'Fetch Failed');
-
-                currentZones = data.data || [];
-                renderTags();
-                
-                setStatus('Success!', 'success');
-                resultsContainer.classList.remove('hidden');
-                
-            } catch (error) {
-                console.error(error);
-                setStatus('Error', 'error');
-                
-                let msg = error.message;
-                if(msg.includes('403')) {
-                    msg = "Access Denied (403). \n\n1. Use the 'Verify API Key' link above.\n2. If that works, double check your Publisher ID.\n3. If Verify fails, check 'Zones' permission in AdButler API settings.";
-                }
-                alert(msg);
-
-            } finally {
-                fetchZonesButton.innerHTML = '<i class="fa-solid fa-bolt mr-2"></i> Get Zone Tags';
-                fetchZonesButton.disabled = false;
-            }
-        });
-
-        function setStatus(msg, type) {
-            statusMessage.textContent = msg;
-            statusIndicator.className = `w-3 h-3 rounded-full mr-3 ${type === 'success' ? 'bg-green-400' : (type === 'error' ? 'bg-red-500' : 'bg-gray-400')}`;
-        }
-
-        // --- RENDER LOGIC ---
-        function renderTags() {
-            websiteTagsContainer.innerHTML = '';
-            emailTagsContainer.innerHTML = '';
-            
-            const webType = tagTypeSelect.value;
-            const pubId = publisherIdInput.value.trim();
-
-            let euid = euidSelect.value;
-            if (euid === 'custom') {
-                euid = euidCustomInput.value.trim();
-            }
-            if (!euid) euid = '[EUID_PLACEHOLDER]';
-
-            // Global Header
-            globalHeaderScript.value = `<script type="text/javascript">
-if (!window.AdButler){
-    (function(){
-        var s = document.createElement("script"); s.async = true; s.type = "text/javascript"; 
-        s.src = 'https://${DOMAIN}/app.js'; 
-        var n = document.getElementsByTagName("script")[0]; n.parentNode.insertBefore(s, n);
-    }());
-}
-<\/script>`;
-
-            currentZones.forEach(zone => {
-                if (zone.type === 'banner' || zone.type === 'website') {
-                    const divId = `placement_${zone.id}_0`;
-                    let code = '';
-                    
-                    if (webType === 'async') {
-                        code = `<!-- AdButler Zone: ${zone.name} -->
-<div id="${divId}" class="adbutler-zone" style="min-height:${zone.height}px; width:100%; max-width:${zone.width}px; margin: 0 auto;"></div>
-<script type="text/javascript">
-    var AdButler = AdButler || {}; AdButler.ads = AdButler.ads || [];
-    AdButler.ads.push({handler: function(opt){ AdButler.register(${pubId}, ${zone.id}, [${zone.width},${zone.height}], '${divId}', opt); }, opt: { place: 0, keywords: '', domain: '${DOMAIN}', click: 'CLICK_MACRO_PLACEHOLDER' }});
-<\/script>`;
-                    } else {
-                         code = `<!-- AdButler Zone: ${zone.name} -->
-<script type="text/javascript">
-var AdButler = AdButler || {}; AdButler.ads = AdButler.ads || [];
-AdButler.ads.push({handler: function(opt){ AdButler.register(${pubId}, ${zone.id}, [${zone.width},${zone.height}], 'placement_${zone.id}_'+opt.place, opt); }, opt: { place: 0, keywords: '', domain: '${DOMAIN}', click: 'CLICK_MACRO_PLACEHOLDER' }});
-<\/script>`;
-                    }
-                    websiteTagsContainer.appendChild(createCard(zone, code, 'web'));
-                } 
-                else if (zone.type === 'email') {
-                    const code = `<!-- Email Zone: ${zone.name} -->
-<a href="https://${DOMAIN}/cl.srv?sid=${pubId}&zone=${zone.id}&pid=0&ord=${euid}" target="_blank">
-    <img src="https://${DOMAIN}/ad.srv?sid=${pubId}&zone=${zone.id}&pid=0&ord=${euid}" alt="${zone.name}" width="${zone.width}" height="${zone.height}" style="display:block; max-width:100%; height:auto; border:0;">
-</a>`;
-                    emailTagsContainer.appendChild(createCard(zone, code, 'email'));
-                }
-            });
-            
-            if (websiteTagsContainer.children.length === 0) websiteTagsContainer.innerHTML = '<p class="text-gray-500">No website zones found.</p>';
-            if (emailTagsContainer.children.length === 0) emailTagsContainer.innerHTML = '<p class="text-gray-500">No email zones found.</p>';
-        }
-
-        function createCard(zone, code, type) {
-            const wrapper = document.createElement('div');
-            wrapper.className = `bg-white rounded-lg border shadow-sm overflow-hidden ${type === 'web' ? 'border-l-4 border-l-brand-teal' : 'border-l-4 border-l-yellow-400'}`;
-            const uniqueId = `area-${zone.id}`;
-            wrapper.innerHTML = `
-                <div class="p-4 border-b flex justify-between items-center bg-gray-50">
-                    <div><h4 class="font-bold text-gray-800">${zone.name}</h4><span class="text-xs text-gray-500">ID: ${zone.id} | ${zone.width}x${zone.height}</span></div>
-                    <button onclick="copyToClipboard('${uniqueId}')" class="text-gray-400 hover:text-brand-teal"><i class="fa-regular fa-copy fa-lg"></i></button>
-                </div>
-                <div class="p-0"><textarea id="${uniqueId}" readonly class="w-full h-32 p-4 text-xs font-mono bg-white text-gray-600 focus:outline-none resize-y block border-none">${code}</textarea></div>`;
-            return wrapper;
-        }
-
-        window.copyToClipboard = function(id) {
-            document.getElementById(id).select();
-            document.execCommand('copy');
-            const toast = document.getElementById('toast');
-            toast.classList.remove('opacity-0', 'translate-y-20');
-            setTimeout(() => toast.classList.add('opacity-0', 'translate-y-20'), 3000);
-        };
-    </script>
 </body>
 </html>
